@@ -3,7 +3,8 @@ package com.aria.apiconsumption
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.aria.apiconsumption.ui.screen.MainScreen
+import androidx.navigation.compose.rememberNavController
+import com.aria.apiconsumption.ui.navigation.AppNavGraph
 import com.aria.apiconsumption.ui.theme.ApiConsumptionTheme
 
 class MainActivity : ComponentActivity() {
@@ -11,7 +12,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             ApiConsumptionTheme {
-                MainScreen()
+                val navController = rememberNavController()
+                AppNavGraph(navController = navController)
             }
         }
     }
