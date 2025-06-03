@@ -171,6 +171,42 @@ Ejecuta la aplicación en un emulador o dispositivo físico.
 
 Verifica que se muestre el mensaje de saludo en la pantalla principal.
 
+---
+
+# 📦 Lista de Dependencias y Propósitos
+
+## 🧠 Backend – Spring Boot (restapi/build.gradle.kts)
+
+| Dependencia                      | Propósito                                                                 |
+|----------------------------------|---------------------------------------------------------------------------|
+| `spring-boot-starter-web`       | Soporte para servicios RESTful y controlador HTTP                        |
+| `spring-boot-starter-test`      | Framework de pruebas para controladores, REST y lógica de negocio        |
+| `spring-boot-devtools`          | Hot reload en desarrollo, recarga rápida de clases                       |
+| `spring-boot-starter-json`      | Serialización y deserialización automática de objetos JSON               |
+| `kotlin("jvm")`                 | Compilación para Java Virtual Machine con soporte Kotlin                 |
+| `kotlin("plugin.spring")`       | Integración de Kotlin con Spring Boot                                    |
+| `kotlin("plugin.serialization")`| Serialización segura y automática con Kotlin                             |
+
+---
+
+## 🤖 Android App – Jetpack Compose (apiconsumption/build.gradle.kts)
+
+| Dependencia                                | Propósito                                                              |
+|--------------------------------------------|------------------------------------------------------------------------|
+| `androidx.core:core-ktx`                   | Extensiones Kotlin para clases básicas de Android                     |
+| `androidx.activity:activity-compose`       | Soporte de Jetpack Compose en componentes de actividad                |
+| `androidx.lifecycle:lifecycle-runtime-ktx` | Ciclo de vida + corrutinas en ViewModels                              |
+| `androidx.lifecycle:lifecycle-viewmodel-compose` | Integración de ViewModel con Compose UI                         |
+| `androidx.compose.material3`               | Componentes visuales modernos (Material 3)                            |
+| `androidx.navigation:navigation-compose`   | Navegación declarativa entre pantallas con Jetpack Compose           |
+| `com.squareup.retrofit2:retrofit`          | Cliente HTTP para consumir APIs REST                                  |
+| `com.squareup.retrofit2:converter-gson`    | Conversor JSON automático con Retrofit y Gson                         |
+| `io.coil-kt:coil-compose`                  | Carga de imágenes desde URL en Compose (basado en Coil)              |
+| `com.google.accompanist:accompanist-swiperefresh` | Pull-to-refresh en Jetpack Compose                            |
+| `org.jetbrains.kotlinx:kotlinx-coroutines-android` | Corrutinas para operaciones asíncronas en Android              |
+
+---
+
 ## 📷 Evidencias – Capturas de pantalla
 
 ### 🔹 Ejecución del backend
