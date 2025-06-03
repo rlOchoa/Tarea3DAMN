@@ -62,20 +62,21 @@ Se ha implementado una prueba unitaria para el endpoint `/api/saludo` utilizando
 
 ## 🚀 Instrucciones para ejecutar el backend
 Navega a la carpeta restapi:
-
 ``` bash
 cd restapi
 ```
-Ejecuta la aplicación:
 
+Ejecuta la aplicación:
 ``` bash
 ./gradlew bootRun
 ```
-Verifica que el endpoint esté disponible accediendo a:
 
+Verifica que el endpoint esté disponible accediendo a:
 ``` bash
 http://localhost:8080/api/saludo
 ```
+![image](https://github.com/user-attachments/assets/d95d84b9-c7fe-4f77-9806-2b9c9b947a61)
+
 
 La consola debe de ser capaz de mostrar el siguiente mensaje en cuanto se ejecute correctamente la inicialización del backend.
 ![image](https://github.com/user-attachments/assets/b5c9aa00-115d-490a-b56a-287b50826be1)
