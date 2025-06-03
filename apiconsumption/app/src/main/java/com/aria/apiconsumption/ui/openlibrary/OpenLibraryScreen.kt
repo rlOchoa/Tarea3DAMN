@@ -15,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -23,6 +24,8 @@ import com.aria.apiconsumption.data.openlibrary.model.Book
 import kotlinx.coroutines.launch
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,6 +39,7 @@ fun OpenLibraryScreen(
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = uiState is OpenLibraryUiState.Loading)
 
     val categorias = listOf("Fantasía", "Ciencia Ficción", "Historia", "Tecnología", "Romance")
 
@@ -109,58 +113,93 @@ fun OpenLibraryScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                when (uiState) {
-                    is OpenLibraryUiState.Loading -> {
-                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            CircularProgressIndicator()
+                SwipeRefresh(
+                    state = swipeRefreshState,
+                    onRefresh = { viewModel.refresh() }
+                ) {
+                    when (uiState) {
+                        is OpenLibraryUiState.Loading -> {
+                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                CircularProgressIndicator()
+                            }
                         }
-                    }
-                    is OpenLibraryUiState.Success -> {
-                        val books = (uiState as OpenLibraryUiState.Success).books
-                        if (isGrid) {
-                            LazyVerticalGrid(
-                                columns = GridCells.Fixed(2),
+
+                        is OpenLibraryUiState.Success -> {
+                            val books = (uiState as OpenLibraryUiState.Success).books
+                            if (isGrid) {
+                                LazyVerticalGrid(
+                                    columns = GridCells.Fixed(2),
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentPadding = PaddingValues(8.dp),
+                                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    items(books) { book ->
+                                        BookGridItem(book = book) {
+                                            navController.navigate(
+                                                "public/detail/${
+                                                    URLEncoder.encode(book.title.orEmpty(), StandardCharsets.UTF_8.name())
+                                                }/${
+                                                    URLEncoder.encode(book.author_name?.firstOrNull().orEmpty(), StandardCharsets.UTF_8.name())
+                                                }/${book.cover_i ?: "null"}/${
+                                                    URLEncoder.encode(book.key.orEmpty(), StandardCharsets.UTF_8.name())
+                                                }"
+                                            )
+                                        }
+                                    }
+                                }
+                            } else {
+                                LazyColumn {
+                                    items(books) { book ->
+                                        BookItem(book = book) {
+                                            navController.navigate(
+                                                "public/detail/${
+                                                    URLEncoder.encode(book.title.orEmpty(), StandardCharsets.UTF_8.name())
+                                                }/${
+                                                    URLEncoder.encode(book.author_name?.firstOrNull().orEmpty(), StandardCharsets.UTF_8.name())
+                                                }/${book.cover_i ?: "null"}/${
+                                                    URLEncoder.encode(book.key.orEmpty(), StandardCharsets.UTF_8.name())
+                                                }"
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        is OpenLibraryUiState.Empty -> {
+                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                Text(
+                                    "No se encontraron resultados, intenta con otra búsqueda.",
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        }
+
+                        is OpenLibraryUiState.Error -> {
+                            val msg = (uiState as OpenLibraryUiState.Error).message
+                            Column(
                                 modifier = Modifier.fillMaxSize(),
-                                contentPadding = PaddingValues(8.dp),
-                                verticalArrangement = Arrangement.spacedBy(8.dp),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                items(books) { book ->
-                                    BookGridItem(book = book) {
-                                        navController.navigate(
-                                            "public/detail/${
-                                                URLEncoder.encode(book.title.orEmpty(), StandardCharsets.UTF_8.name())
-                                            }/${
-                                                URLEncoder.encode(book.author_name?.firstOrNull().orEmpty(), StandardCharsets.UTF_8.name())
-                                            }/${book.cover_i ?: "null"}"
-                                        )
-                                    }
-                                }
-                            }
-                        } else {
-                            LazyColumn {
-                                items(books) { book ->
-                                    BookItem(book = book) {
-                                        navController.navigate(
-                                            "public/detail/${
-                                                URLEncoder.encode(book.title.orEmpty(), StandardCharsets.UTF_8.name())
-                                            }/${
-                                                URLEncoder.encode(book.author_name?.firstOrNull().orEmpty(), StandardCharsets.UTF_8.name())
-                                            }/${book.cover_i ?: "null"}"
-                                        )
-                                    }
+                                Text(
+                                    text = msg,
+                                    color = MaterialTheme.colorScheme.error,
+                                    textAlign = TextAlign.Center
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Button(onClick = { viewModel.retry() }) {
+                                    Text("Reintentar")
                                 }
                             }
                         }
-                    }
-                    is OpenLibraryUiState.Error -> {
-                        Text(
-                            text = (uiState as OpenLibraryUiState.Error).message,
-                            color = MaterialTheme.colorScheme.error
-                        )
-                    }
-                    OpenLibraryUiState.Idle -> {
-                        Text("Realiza una búsqueda o abre el menú para ver categorías.")
+
+                        OpenLibraryUiState.Idle -> {
+                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                Text("Realiza una búsqueda o abre el menú para ver categorías.")
+                            }
+                        }
                     }
                 }
             }
